@@ -19,9 +19,12 @@ lib64/
 parts/
 sdist/
 var/
+data_safekeep/
 wheels/
 share/python-wheels/
 *.egg-info/
+predicted_prophet_data_v2/
+predicted_prophet_data_v3/
 .installed.cfg
 *.egg
 MANIFEST

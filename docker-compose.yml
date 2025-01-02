@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  ubuntu_server:
+    image: ubuntu:latest
+    container_name: ubuntu_server_8081
+    ports:
+      - "8081:80"
+    volumes:
+      - "/mnt/d_drive/Upwork/Store-Sales---Time-Series-Forecasting--Kaggle/shared:/sharedd"
+    environment:
+      - DEBIAN_FRONTEND=noninteractive  # Suppress interactive prompts
+      - TZ=Etc/UTC                      # Set your desired timezone
+    working_dir: /sharedd
+    stdin_open: true
+    tty: true
+    command: >
+      /bin/bash -c "
+      apt-get update && 
+      apt-get install -y tzdata python3 python3-pip python3-venv && 
+      ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && 
+      dpkg-reconfigure --frontend noninteractive tzdata &&
+      python3 -m venv venv && 
+      . venv/bin/activate && 
+      pip install -r requirements.txt &&
+      tail -f /dev/null
+      "
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"      # Limit to 1 CPU
+          memory: "1g"

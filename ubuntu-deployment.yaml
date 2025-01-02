@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu-server-v3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ubuntu
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      containers:
+      - name: ubuntu
+        image: ubuntu:latest
+        command: ["/bin/bash", "-c", "
+	  apt-get update &&
+	  apt-get install -y tzdata python3 python3-pip python3-venv &&
+	  ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime &&
+	  dpkg-reconfigure --frontend noninteractive tzdata &&
+	  python3 -m venv /app/venv &&
+	  source /app/venv/bin/activate &&
+	  pip install -r /shared/requirements.txt || { echo 'Pip install failed'; exit 1; } && 
+    echo 'installing requirements is done' &&  tail -f /dev/null"]
+        ports:
+          - containerPort: 8082
+          - containerPort: 8083
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2"
+        volumeMounts:
+          - name: shared-data
+            mountPath: /shared  # Adjusted mount path to avoid confusion
+      volumes:
+        - name: shared-data
+          hostPath:
+            path: "/mnt/d_drive/Upwork/Store-Sales---Time-Series-Forecasting--Kaggle/shared/"
+            type: Directory 
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubuntu-service-v3
+spec:
+  selector:
+    app: ubuntu
+  ports:
+    - name: http-port-8082
+      protocol: TCP
+      port: 8082
+      targetPort: 8082
+    - name: http-port-8083
+      protocol: TCP
+      port: 8083
+      targetPort: 8083
+  type: NodePort

@@ -5,7 +5,7 @@ from Exception import CustomException
 import sys
 
 # Server details
-SERVERS = ["http://192.168.49.2:30656"]
+SERVERS = ["http://127.0.0.1:8081"]
 
 # Paths to data
 TRAIN_FILE = "shared/df_hol_s.csv"
